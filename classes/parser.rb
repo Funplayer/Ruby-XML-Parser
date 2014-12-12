@@ -1,5 +1,5 @@
 require_relative '../modules/symbols'
-require_relative '../modules/nodes'
+require_relative '../modules/element'
 
 class XML_Parser
 	
@@ -8,69 +8,119 @@ class XML_Parser
 		@current_line = 0
 		@parents = []
 	end
+	
+	################################################################################################
+	# Returns object or objects
+	################################################################################################
+	# Returns the current line.
+	def line
+		return @file_data[@current_line]
+	end
+	
+	################################################################################################
+	# Returns logical boolean
+	################################################################################################
+	# Determines if the current line is the begining of a comment
+	def comment_begins?
+		return line.includes?(Syms.get_op(:COMO))
+	end
+	# Determines if the current line is the end of a comment
+	def comment_finished?
+		return line.includes?(Syms.get_op(:COMC))
+	end
+	# Determines if the current line is the openning of an element
+	def openning_element?
+
+	end
+	# Determines if the current line is the closing of an element
+	def closing_element?
+	end
+	# Does the element header contain attributes
+	def attributes_exist?
+	end
+	# Does the next line contain a child, or a same level element
+	def children_exist?
+	end
+	
+	################################################################################################
+	# Function/Mutation mixes
+	################################################################################################
+	def get_xml_header
+	end
+	def get_namespace
+		if !line.includes?(":")
+			return "" 
+		end
+		for i in 0...line.size
+			if i 
+		end
+	end
+	
+	def down_line
+		@current_line += 1
+	end
+	
+	def up_line
+		@current_line -= 1
+	end
+	
+	################################################################################################
+	# External calls
+	################################################################################################
 	#todo Check|Register for ? point for named xml document type.
 	#todo Check|Register for version.
 	#todo Check|Register for document UTF type.
 		
 	def parse
 		#todo Check|Split for comment.
-		if line_is_comment?
-			while line_is_comment?
-				next_line
+		if comment_begins?
+			until comment_ends?
+				down_line
 			end
-			@comment_started = false
 		end
-		# increment level of recursion
+		
+		# increment level of recursion for debugging
 		@level += 1
 		
-		# Gets the namespace, if one exists.
-		tmp_namespace = get_namespace
+		#todo check for openning identifier
+		if openning_element?
+			# Gets the namespace, if one exists.
+			tmp_namespace = get_namespace
+			
+			#todo Check|Register identifier prefix.
+			tmp_identifier = get_identifier
+			
+			# creates attribute list for this level of the stack.
+			attributes = []
+			while attributes_exist?
+				#todo Check|Register attribute prefix.
+				attribute_prefix = get_attribute_prefix
+				
+				#todo Check|Register attribute identifier.
+				attribute_identifier = get_attribute_identifier
+				
+				#todo Check|Register attribute field.
+				attribute_field = get_attribute_field
+				
+				attributes.push Attribute.new(attribute_prefix, attribute_identifier, attribute_field)
+			end
+			element = Element.new(tmp_namespace, tmp_identifier, attributes)
+			if children_exist?
+				# Find the openning of a element.
+				while children_exist?
+					element.add(parse)
+				end
+				return element
+			end
+			
+			#todo add element data
+			element.data = get_element_data
+			return element
+		#todo check for closing identifier
+		elsif closing_element?
 		
-		#todo Check|Register identifier prefix.
-		identifier = get_identifier
-		#todo Check|Register identifier name.
-		identifier_name = get_identifier_name
-		attributes = []
-		while attributes_exist?
-			#todo Check|Register attribute prefix.
-			attribute_prefix = get_attribute_prefix
-			#todo Check|Register attribute identifier.
-			attribute_identifier = get_attribute_identifier
-			@attributes.push 
 		end
-
-		# Find the openning of a node.
-		node = Node.new
-		while children_exist?
-			node.add(parse)
-		end
-		return node
-	end
-	
-	def line_is_comment?
-		if @current_line.includes?("<!--")
-			@comment_started = true
-		elsif @current_line.inclued?("-->")
-			@comment_started = false
-		end
-		return @comment_started
-	end
-	
-	def get_xml_header
-	end
-	
-	def get_table
-	end
-	
-	def get_namespace
-	end
-	
-	def next_line
-		@current_line += 1
-	end
-	
-	def back_line
-		@current_line -= 1
+		
 	end
 	
 	def open(file_location)
