@@ -20,12 +20,6 @@ module Syms
 		"quot"	=> '\"',
 	}
 	
-	#\s*<([a-zA-Z]*)\s*(?:[a-zA-Z]*)\s*=\s*"(\w*)"
-	REGEXLOGIC = {
-		:IDENT => /<([a-zA-Z]*)/,
-		:ATTR1 => /<[a-zA-Z]* ([a-zA-Z]*)/
-	}
-	
 	def get_op(symb)
 		return OPERATORS[symb]
 	end
@@ -36,4 +30,4 @@ module Syms
 	
 end
 
-Symbols::OPERATORS[:LPNT]
+#Symbols::OPERATORS[:LPNT]

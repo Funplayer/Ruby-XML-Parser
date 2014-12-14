@@ -13,7 +13,7 @@ class Element
 		@attribute_prefix = attribute_prefix
 		@attributes = attributes
 		@elements = []
-		@data = nil
+		@data = ""
 	end
 	
 	def add(element)
